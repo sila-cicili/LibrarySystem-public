@@ -3,26 +3,39 @@ using LibrarySystem.Models;
 
 namespace LibrarySystem.Services
 {
-    // IBookService menüsündeki işleri "uygulayan" (implement) sınıf
     public class BookService : IBookService
     {
         private readonly KütüphaneeContext _context;
 
-        // Dependency Injection ARTIK BURADA YAPILIYOR
         public BookService(KütüphaneeContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Book>> TumKitaplariGetir(string aramaKelimesi)
+        // 👇 GÜNCELLENEN METOD (İmzayı IBookService ile aynı yaptık)
+        public async Task<List<Book>> TumKitaplariGetir(string aramaKelimesi, int? branchId = null)
         {
-            var books = from b in _context.Books select b;
+            // Kitapları çekerken Şube bilgisini de (LibraryBranch) yanına al
+            var books = _context.Books
+                .Include(b => b.LibraryBranch) 
+                .AsQueryable();
+
+            // 1. Eğer şube ID geldiyse, sadece o şubedekileri filtrele
+            if (branchId.HasValue)
+            {
+                books = books.Where(b => b.LibraryBranchId == branchId.Value);
+            }
+
+            // 2. Arama kelimesi varsa ona göre de filtrele
             if (!string.IsNullOrEmpty(aramaKelimesi))
             {
                 books = books.Where(s => s.Title.Contains(aramaKelimesi) || s.Author.Contains(aramaKelimesi));
             }
+
             return await books.ToListAsync();
         }
+
+        // --- Diğer metodlar (Aynı kalıyor) ---
 
         public async Task<Book?> KitapGetirIdIle(int? id)
         {
@@ -52,6 +65,3 @@ namespace LibrarySystem.Services
         }
     }
 }
-
-
-

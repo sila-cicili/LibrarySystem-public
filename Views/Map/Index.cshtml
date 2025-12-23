@@ -77,7 +77,10 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Seçilen konumu göstermek için geçici marker
+    // Yetki kontrolü (Razor -> JS)
+    var isAdmin = @(User.IsInRole("admin").ToString().ToLower());
+
+    // Konum seçme değişkenleri
     var selectionMarker;
     var isSelectingLocation = false;
 
@@ -85,60 +88,86 @@
     loadBranches();
 
     function loadBranches() {
+        // Haritadaki eski pinleri temizlemek gerekirse buraya map.eachLayer... eklenebilir
+        // Ama şimdilik basit tutalım.
+        
         fetch('/api/LibraryApi')
             .then(response => response.json())
             .then(data => {
                 data.forEach(branch => {
+                    
+                    // Baloncuk İçeriğini Hazırla
+                    let popupContent = `<div class="text-center">
+                                            <b>${branch.name}</b><br>
+                                            <span class="text-muted" style="font-size:12px">${branch.address}</span>
+                                        </div>`;
+
+                    // EĞER ADMİN İSE SİL BUTONU EKLE 🗑️
+                    if (isAdmin) {
+                        popupContent += `<hr class="my-2">
+                                         <button class="btn btn-danger btn-sm w-100" onclick="deleteBranch(${branch.id})">
+                                            🗑️ Şubeyi Sil
+                                         </button>`;
+                    }
+
+                    // İşaretçiyi haritaya ekle
                     L.marker([branch.lat, branch.lng])
                         .addTo(map)
-                        .bindPopup(`<b>${branch.name}</b><br>${branch.address}`);
+                        .bindPopup(popupContent);
                 });
             })
             .catch(error => console.error('Hata:', error));
     }
 
-    // --- YENİ FONKSİYONLAR ---
+    // --- SİLME FONKSİYONU (YENİ) ---
+    function deleteBranch(id) {
+        if (confirm("Bu kütüphane şubesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) {
+            fetch(`/api/LibraryApi/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("🗑️ Kütüphane silindi.");
+                    location.reload(); // Haritayı yenile
+                } else {
+                    alert("Hata oluştu, silinemedi.");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    }
 
-    // Konum Seçme Modunu Başlat
+    // --- EKLEME İŞLEMLERİ (ESKİ KODLARIN AYNISI) ---
+
     function startLocationSelection() {
-        // Modalı kapat
         var modalEl = document.getElementById('addBranchModal');
         var modal = bootstrap.Modal.getInstance(modalEl);
         modal.hide();
 
         isSelectingLocation = true;
-        
-        // Kullanıcıya bilgi ver (Haritanın üstüne yazı ekleyerek)
         alert("Lütfen haritada kütüphanenin konumunu işaretleyin.");
-        document.getElementById('map').style.cursor = "crosshair"; // İmleci değiştir
+        document.getElementById('map').style.cursor = "crosshair";
     }
 
-    // Haritaya Tıklama Olayı
     map.on('click', function(e) {
-        if (isSelectingLocation) {
-            // Enlem Boylamı al
+        if (isAdmin && isSelectingLocation) {
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
 
-            // Formdaki kutulara yaz
             document.getElementById('branchLat').value = lat;
             document.getElementById('branchLng').value = lng;
 
-            // Haritaya geçici işaret koy
             if (selectionMarker) map.removeLayer(selectionMarker);
             selectionMarker = L.marker([lat, lng]).addTo(map);
 
-            // Modalı tekrar aç
             var modal = new bootstrap.Modal(document.getElementById('addBranchModal'));
             modal.show();
 
-            // Seçim modunu bitir
             isSelectingLocation = false;
             document.getElementById('map').style.cursor = "";
         }
     });
 
-    // Kaydet Butonuna Basınca
     function saveBranch() {
         var name = document.getElementById('branchName').value;
         var address = document.getElementById('branchAddress').value;
@@ -146,25 +175,24 @@
         var lng = document.getElementById('branchLng').value;
 
         if (!name || !address || !lat) {
-            alert("Lütfen tüm alanları doldurun ve haritadan konum seçin!");
+            alert("Lütfen tüm alanları doldurun!");
             return;
         }
 
-        // Veriyi gönder
         fetch('/api/LibraryApi', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: name,
-                address: address, // Artık adresi de gönderiyoruz
+                address: address,
                 lat: parseFloat(lat),
                 lng: parseFloat(lng)
             })
         })
         .then(response => {
             if (response.ok) {
-                alert("✅ Kütüphane başarıyla eklendi!");
-                location.reload(); // Sayfayı yenile ki yeni şube görünsün
+                alert("✅ Eklendi!");
+                location.reload();
             } else {
                 alert("Hata oluştu!");
             }

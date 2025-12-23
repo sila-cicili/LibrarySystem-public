@@ -1,35 +1,78 @@
 @model LibrarySystem.Models.Book
 
-<div class="container mt-5">
-    <h2 class="text-primary">Yeni Kitap Ekle</h2>
-    <hr />
-    
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label class="form-label">Kitap Adı</label>
-                    <input asp-for="Title" class="form-control" required />
-                </div>
+@{
+    ViewData["Title"] = "Yeni Kitap Ekle";
+}
 
-                <div class="mb-3">
-                    <label class="form-label">Yazar</label>
-                    <input asp-for="Author" class="form-control" required />
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">➕ Yeni Kitap Ekle</h3>
                 </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <div class="mb-3">
-                    <label class="form-label">Kategori</label>
-                    <input asp-for="Category" class="form-control" />
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="control-label fw-bold">Kitap Adı</label>
+                            <input asp-for="Title" class="form-control" placeholder="Örn: Sefiller" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Author" class="control-label fw-bold">Yazar</label>
+                                <input asp-for="Author" class="form-control" placeholder="Örn: Victor Hugo" />
+                                <span asp-validation-for="Author" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Category" class="control-label fw-bold">Kategori</label>
+                                <input asp-for="Category" class="form-control" placeholder="Örn: Klasik" />
+                                <span asp-validation-for="Category" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3 p-3 bg-light border rounded">
+                            <label asp-for="LibraryBranchId" class="control-label fw-bold text-success">📍 Kütüphane Şubesi</label>
+                            
+                            <select asp-for="LibraryBranchId" class ="form-control" asp-items="ViewBag.LibraryBranchId">
+                                <option value="">-- Şube Seçiniz (Depo) --</option>
+                            </select>
+                            
+                            <small class="text-muted">Bu kitabı fiziksel olarak hangi şubeye ekliyorsunuz?</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="TotalStock" class="control-label fw-bold">Toplam Stok</label>
+                                <input asp-for="TotalStock" class="form-control" type="number" value="1" min="1" />
+                                <span asp-validation-for="TotalStock" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="CurrentStock" class="control-label fw-bold">Mevcut Stok</label>
+                                <input asp-for="CurrentStock" class="form-control" type="number" value="1" min="0" />
+                                <span asp-validation-for="CurrentStock" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DateAdded" class="control-label">Eklendiği Tarih</label>
+                            <input asp-for="DateAdded" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="DateAdded" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                            <button type="submit" class="btn btn-success fw-bold">💾 Kaydet ve Ekle</button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Toplam Stok Sayısı</label>
-                    <input asp-for="TotalStock" type="number" class="form-control" min="1" value="1" required />
-                </div>
-
-                <button type="submit" class="btn btn-success">Kaydet</button>
-                <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

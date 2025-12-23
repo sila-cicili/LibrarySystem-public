@@ -38,6 +38,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/casper/OneDrive/Masaüstü/kütüphanesistemi/LibrarySystem/Views/Books/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/casper/OneDrive/Masaüstü/kütüphanesistemi/LibrarySystem/Views/Books/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -68,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/casper/OneDrive/Masaüstü/kütüphanesistemi/LibrarySystem/Views/Requests/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVxdWVzdHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/casper/OneDrive/Masaüstü/kütüphanesistemi/LibrarySystem/Views/Requests/MyRequests.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVxdWVzdHNcTXlSZXF1ZXN0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/casper/OneDrive/Masaüstü/kütüphanesistemi/LibrarySystem/Views/Shared/Error.cshtml]

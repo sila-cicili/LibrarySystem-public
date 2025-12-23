@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LibrarySystem.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization; // Yetki kontrolü için
+using Microsoft.AspNetCore.Authorization; // Yetki kontrolleri için
 using NetTopologySuite.Geometries;      // Harita (Point) işlemleri için
 
 namespace LibrarySystem.Controllers
@@ -18,7 +18,7 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: api/LibraryApi
-        // Tüm kütüphaneleri haritada göstermek için çeker
+        // Tüm kütüphaneleri haritada göstermek için listeler
         [HttpGet]
         public async Task<IActionResult> GetBranches()
         {
@@ -37,40 +37,54 @@ namespace LibrarySystem.Controllers
         }
 
         // POST: api/LibraryApi
-        // Sadece Adminler yeni şube ekleyebilir
+        // Yeni şube ekleme (Sadece Admin)
         [HttpPost]
         [Authorize(Roles = "admin")] 
         public async Task<IActionResult> AddBranch([FromBody] BranchDto data)
         {
-            // 1. Basit Validasyon
             if (data == null || string.IsNullOrEmpty(data.Name))
                 return BadRequest("Şube adı boş olamaz.");
 
-            // 2. Koordinat Dönüşümü (Frontend'den gelen Lat/Lng -> PostGIS Point)
-            // SRID 4326 standart GPS koordinat sistemidir.
+            // Harita koordinatını oluştur (SRID 4326 = GPS standardı)
             var location = new Point(data.Lng, data.Lat) { SRID = 4326 };
 
-            // 3. Yeni Nesneyi Oluştur
             var newBranch = new LibraryBranch
             {
                 Name = data.Name,
-                Address = data.Address, // 👈 GÜNCELLEME BURADA: Artık adresi de kaydediyoruz
+                Address = data.Address,
                 Location = location
             };
 
-            // 4. Veritabanına Ekle ve Kaydet
             _context.LibraryBranches.Add(newBranch);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Başarıyla eklendi!" });
         }
+
+        // DELETE: api/LibraryApi/5
+        // Şube silme (Sadece Admin)
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteBranch(int id)
+        {
+            var branch = await _context.LibraryBranches.FindAsync(id);
+            if (branch == null)
+            {
+                return NotFound("Kütüphane bulunamadı.");
+            }
+
+            _context.LibraryBranches.Remove(branch);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Kütüphane başarıyla silindi." });
+        }
     }
 
-    // Frontend'den gelen veriyi karşılayan paket (Data Transfer Object)
+    // Frontend ile veri alışverişi için kullanılan model
     public class BranchDto
     {
         public string Name { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty; // 👈 EKLENEN KISIM
+        public string Address { get; set; } = string.Empty;
         public double Lat { get; set; }
         public double Lng { get; set; }
     }

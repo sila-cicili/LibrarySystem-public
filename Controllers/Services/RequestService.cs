@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibrarySystem.Services
 {
@@ -12,57 +12,67 @@ namespace LibrarySystem.Services
             _context = context;
         }
 
+        // 1. Bekleyen Talepler (Yönetici)
         public async Task<List<Request>> BekleyenTalepleriGetir()
         {
             return await _context.Requests
                 .Include(r => r.Book)
                 .Include(r => r.User)
-                .Where(r => r.Status == "pending")
-                .OrderBy(r => r.RequestDate)
+                .Where(r => r.Status == "Pending")
                 .ToListAsync();
         }
 
+        // 2. Onayla
         public async Task TalebiOnayla(int requestId)
         {
             var request = await _context.Requests.FindAsync(requestId);
-            if (request == null) return;
-
-            var book = await _context.Books.FindAsync(request.BookId);
-            
-            // Stok Kontrolü
-            if (book != null && book.CurrentStock > 0)
+            if (request != null)
             {
-                // 1. Ödünç Kaydı Oluştur
-                var loan = new Loan
-                {
-                    UserId = request.UserId,
-                    BookId = request.BookId,
-                    BorrowDate = DateOnly.FromDateTime(DateTime.Now),
-                    DueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(15)),
-                    Status = "active"
-                };
-                _context.Loans.Add(loan);
-
-                // 2. Stok Düş
-                book.CurrentStock -= 1;
-                _context.Update(book);
-
-                // 3. Talebi Sil
-                _context.Requests.Remove(request);
-                
-                // Hepsini tek seferde kaydet (Transaction mantığı)
+                request.Status = "Approved";
                 await _context.SaveChangesAsync();
             }
         }
 
+        // 3. Reddet
         public async Task TalebiReddet(int requestId)
         {
             var request = await _context.Requests.FindAsync(requestId);
             if (request != null)
             {
-                _context.Requests.Remove(request);
+                request.Status = "Rejected";
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // 4. Talep Oluştur (Öğrenci)
+        public async Task TalepOlustur(string username, int bookId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user != null)
+            {
+                var newRequest = new Request
+                {
+                    UserId = user.UserId, // Modelinde ID adı neyse onu kullan (user.Id veya user.UserId)
+                    BookId = bookId,
+                    RequestDate = DateTime.Now,
+                    Status = "Pending"
+                };
+                _context.Requests.Add(newRequest);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // 👇 5. KULLANICI TALEPLERİNİ GETİR (Yeni Eklenen Kısım)
+        public async Task<List<Request>> KullaniciTalepleriniGetir(string username)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return new List<Request>();
+
+            return await _context.Requests
+                .Include(r => r.Book) // Kitap adını görmek için Include şart
+                .Where(r => r.UserId == user.UserId) // Sadece bu kullanıcınınkiler
+                .OrderByDescending(r => r.RequestDate) // En yeni en üstte
+                .ToListAsync();
         }
     }
 }

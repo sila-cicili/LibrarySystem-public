@@ -1,0 +1,74 @@
+@model LibrarySystem.Models.Book
+
+@{
+    ViewData["Title"] = "Kitap Detayı";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📖 @Model.Title</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">Yazar</dt>
+                        <dd class="col-sm-8">@Model.Author</dd>
+
+                        <dt class="col-sm-4">Kategori</dt>
+                        <dd class="col-sm-8">@Model.Category</dd>
+
+                        <dt class="col-sm-4">Stok Durumu</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.CurrentStock > 0)
+                            {
+                                <span class="badge bg-success">Mevcut (@Model.CurrentStock adet)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Tükendi</span>
+                            }
+                        </dd>
+                        
+                        <dt class="col-sm-4">Toplam Stok</dt>
+                        <dd class="col-sm-8">@Model.TotalStock</dd>
+
+                        <dt class="col-sm-4">Eklendiği Tarih</dt>
+                        <dd class="col-sm-8">@Model.DateAdded?.ToString("dd.MM.yyyy")</dd>
+
+                        <hr class="my-3">
+
+                        <dt class="col-sm-4">Bulunduğu Şube</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.LibraryBranch != null)
+                            {
+                                <div class="alert alert-info d-inline-block p-2 mb-0">
+                                    <strong>🏢 @Model.LibraryBranch.Name</strong>
+                                    <br>
+                                    <small>📍 @Model.LibraryBranch.Address</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">⚠️ Bu kitap henüz bir şubeye atanmamış (Merkez Depo)</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                
+                <div class="col-md-4 text-center d-flex align-items-center justify-content-center bg-light rounded">
+                    <div style="font-size: 100px;">📚</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary">⬅️ Listeye Dön</a>
+            
+            @if (User.IsInRole("admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">✏️ Düzenle</a>
+            }
+        </div>
+    </div>
+</div>

@@ -48,6 +48,15 @@
                         </li>
                         }
 
+                        @if (!User.IsInRole("admin"))
+                        {
+                        <li class="nav-item">
+                             <a class="nav-link text-dark" asp-controller="Requests" asp-action="MyRequests">📜 Taleplerim</a>
+                         </li>
+                        }
+
+ 
+
                         @if (User.IsInRole("admin"))
                         {
                         <li class="nav-item">

@@ -1,37 +1,77 @@
 @model LibrarySystem.Models.Book
 
-<div class="container mt-5">
-    <h2 class="text-warning">Kitap Düzenle</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Edit">
-                <input type="hidden" asp-for="BookId" />
-                
-                <div class="mb-3">
-                    <label class="form-label">Kitap Adı</label>
-                    <input asp-for="Title" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Yazar</label>
-                    <input asp-for="Author" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Kategori</label>
-                    <input asp-for="Category" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Mevcut Stok</label>
-                    <input asp-for="CurrentStock" type="number" class="form-control" />
-                </div>
-                 <div class="mb-3">
-                    <label class="form-label">Toplam Stok</label>
-                    <input asp-for="TotalStock" type="number" class="form-control" />
-                </div>
+@{
+    ViewData["Title"] = "Kitabı Düzenle";
+}
 
-                <button type="submit" class="btn btn-warning">Güncelle</button>
-                <a asp-action="Index" class="btn btn-secondary">İptal</a>
-            </form>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">✏️ Kitabı Düzenle</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <input type="hidden" asp-for="BookId" />
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="control-label fw-bold">Kitap Adı</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Author" class="control-label fw-bold">Yazar</label>
+                                <input asp-for="Author" class="form-control" />
+                                <span asp-validation-for="Author" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Category" class="control-label fw-bold">Kategori</label>
+                                <input asp-for="Category" class="form-control" />
+                                <span asp-validation-for="Category" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3 p-3 bg-light border rounded">
+                            <label asp-for="LibraryBranchId" class="control-label fw-bold text-primary">📍 Kütüphane Şubesi</label>
+                            
+                            <select asp-for="LibraryBranchId" class="form-control" asp-items="ViewBag.LibraryBranchId">
+                                <option value="">-- Atanmamış (Depo) --</option>
+                            </select>
+                            
+                            <small class="text-muted">Bu kitabı hangi kütüphane şubesine göndermek istiyorsunuz?</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="TotalStock" class="control-label fw-bold">Toplam Stok</label>
+                                <input asp-for="TotalStock" class="form-control" type="number" />
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="CurrentStock" class="control-label fw-bold">Mevcut Stok</label>
+                                <input asp-for="CurrentStock" class="form-control" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DateAdded" class="control-label">Eklendiği Tarih</label>
+                            <input asp-for="DateAdded" class="form-control" type="date" />
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                            <button type="submit" class="btn btn-warning fw-bold">💾 Değişiklikleri Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

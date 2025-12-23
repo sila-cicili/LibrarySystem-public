@@ -1,22 +1,21 @@
-using LibrarySystem.Models; // Modelleri tanıması lazım
+using LibrarySystem.Models;
 
-namespace LibrarySystem.Services // 👈 İŞTE BURASI BookService İLE AYNI OLMALI
+namespace LibrarySystem.Services
 {
     public interface IBookService
     {
-        // Tüm Kitapları Getir
-        Task<List<Book>> TumKitaplariGetir(string aramaKelimesi);
+        // 👇 BURASI DEĞİŞTİ:
+        // Parantez içine 'int? branchId = null' ekledik.
+        // Bu sayede hem arama yapabiliriz hem de şube seçebiliriz.
+        Task<List<Book>> TumKitaplariGetir(string aramaKelimesi, int? branchId = null);
 
-        // Tek Bir Kitap Getir
+        // Diğerleri aynı kalıyor
         Task<Book?> KitapGetirIdIle(int? id);
 
-        // Yeni Kitap Ekle
         Task YeniKitapEkle(Book book);
 
-        // Kitap Güncelle
         Task KitapGuncelle(Book book);
 
-        // Kitap Sil
         Task KitapSil(int id);
     }
 }
