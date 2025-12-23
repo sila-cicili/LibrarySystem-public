@@ -1,0 +1,53 @@
+@model LibrarySystem.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Üye Ol";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h3 class="font-weight-light my-2">📝 Üye Ol</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Register">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Username" class="form-control" placeholder="Kullanıcı Adı" />
+                            <label asp-for="Username">Kullanıcı Adı</label>
+                            <span asp-validation-for="Username" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Şifre" />
+                            <label asp-for="Password">Şifre</label>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Şifre Tekrar" />
+                            <label asp-for="ConfirmPassword">Şifre Tekrar</label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Kayıt Ol</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <div class="small">
+                        <a asp-action="Login" class="text-decoration-none">Zaten hesabın var mı? Giriş Yap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
