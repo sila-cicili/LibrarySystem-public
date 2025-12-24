@@ -1,0 +1,88 @@
+# 📚 Web GIS Library Management System (Kütüphane Yönetim Sistemi)
+
+Bu proje, **GMT 458 – Web GIS** dersi final ödevi kapsamında geliştirilmiş; mekansal (spatial) ve mekansal olmayan verileri bir arada yöneten, farklı kullanıcı rollerine sahip web tabanlı bir Kütüphane Bilgi Sistemidir.
+
+Proje **ASP.NET Core MVC**, **PostgreSQL (PostGIS)** ve **Entity Framework Core** teknolojileri kullanılarak geliştirilmiştir.
+
+---
+
+## 🚀 Proje Özellikleri ve Ödev Gereksinimleri (Project Requirements)
+
+Aşağıdaki tablo, proje gereksinimlerinin (Rubric) ne ölçüde karşılandığını özetlemektedir:
+
+| Gereksinim (Requirement) | Durum | Açıklama |
+| :--- | :---: | :--- |
+| **Source Code Management** | ✅ Tamam | Proje GitHub üzerinde yönetilmektedir. |
+| **Managing User Types** | ✅ Tamam | **3 Farklı Rol:** Öğrenci (15 gün), Akademisyen (30 gün) ve Yönetici (Admin). |
+| **CRUD Operations (Spatial)** | ✅ Tamam | Kütüphane şubeleri (Spatial Point) harita üzerinden Eklenebilir, Silinebilir, Güncellenebilir ve Listelenebilir. |
+| **Authentication** | ✅ Tamam | Cookie tabanlı güvenli Üye Kaydı (Sign-up) ve Giriş (Login) sistemi mevcuttur. |
+| **API Development** | ✅ Tamam | **RESTful API:** Spatial (Şube) ve Non-spatial (Kitap) kaynaklar sunar. <br> **Swagger:** API dokümantasyonu `/swagger` adresinde mevcuttur. <br> **Metotlar:** GET, POST, PUT, DELETE aktif. |
+| **Database** | ✅ Tamam | İlişkisel veritabanı olarak **PostgreSQL** ve mekansal veriler için **PostGIS** kullanılmıştır. |
+| **Dashboard** | ✅ Tamam | Admin panelinde anlık istatistikler ve kitap kategorilerini gösteren **Chart.js** grafikleri bulunmaktadır. |
+
+---
+
+## 🛠️ Kullanılan Teknolojiler
+
+* **Backend:** ASP.NET Core 7.0 (MVC & Web API)
+* **Database:** PostgreSQL 14+ & PostGIS Extension
+* **ORM:** Entity Framework Core (NetTopologySuite ile mekansal veri desteği)
+* **Frontend:** HTML5, Bootstrap 5, JavaScript
+* **Visualization:** Chart.js (Grafikler), Leaflet/Google Maps (Harita İşlemleri)
+* **Documentation:** Swagger UI
+
+---
+
+## 📸 Ekran Görüntüleri (Screenshots)
+
+### 1. Yönetim Paneli (Dashboard)
+*(Buraya Dashboard sayfanın ekran görüntüsünü ekleyebilirsin)*
+
+### 2. Swagger API Dokümantasyonu
+*(Buraya Swagger sayfasının ekran görüntüsünü ekleyebilirsin)*
+
+### 3. Harita ve Şube Yönetimi
+*(Buraya haritalı şube ekleme sayfasının ekran görüntüsünü ekleyebilirsin)*
+
+---
+
+## ⚙️ Kurulum (Installation)
+
+Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin:
+
+1.  **Projeyi Klonlayın:**
+    ```bash
+    git clone [https://github.com/KULLANICI_ADIN/LibrarySystem.git](https://github.com/KULLANICI_ADIN/LibrarySystem.git)
+    ```
+
+2.  **Veritabanı Ayarı:**
+    `appsettings.json` dosyasını açın ve PostgreSQL bağlantı cümleciğini kendi bilgisayarınıza göre düzenleyin:
+    ```json
+    "ConnectionStrings": {
+      "LibraryContext": "Host=localhost;Database=LibraryDb;Username=postgres;Password=sifreniz"
+    }
+    ```
+
+3.  **Veritabanını Oluşturun (Migration):**
+    Terminali açın ve proje dizininde şu komutu çalıştırın:
+    ```bash
+    dotnet ef database update
+    ```
+
+4.  **Projeyi Başlatın:**
+    ```bash
+    dotnet run
+    ```
+    Tarayıcıda `https://localhost:7239` adresine gidin.
+
+---
+
+## 🔗 API Kullanımı
+
+Proje çalışırken API endpointlerini test etmek için tarayıcınızda şu adrese gidin:
+👉 **`https://localhost:7239/swagger`**
+
+* **GET** `/api/LibraryApi/branches` - Tüm kütüphane şubelerini (koordinatlarıyla) getirir.
+* **POST** `/api/LibraryApi/branches` - Yeni bir şube ekler (GeoJSON Point).
+* **PUT** `/api/LibraryApi/branches/{id}` - Şube bilgilerini ve konumunu günceller.
+* **DELETE** `/api/LibraryApi/branches/{id}` - Şubeyi siler.
