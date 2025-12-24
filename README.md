@@ -141,9 +141,9 @@ To demonstrate the impact of indexing mechanisms (B-Trees) on query performance,
 
 | Metric | Before Indexing (Baseline) | After Indexing (B-Tree) | Improvement |
 | :--- | :--- | :--- | :--- |
-| **Scan Type** | Seq Scan (Sequential Scan) | **Index Scan** | ✅ Optimized |
-| **Execution Time** | **22.742 ms** | **0.196 ms** | **~116x Faster** |
-| **Planning Time** | 2.294 ms | 2.792 ms | Negligible change |
+| **Scan Type** | Seq Scan (Sequential Scan) | 
+| **Execution Time** | **22.742 ms** | **0.100 ms** | 
+| **Planning Time** | 2.294 ms | 4.961 ms | 
 
 #### 1. Before Indexing (Sequential Scan)
 Without an index, the database performed a **Seq Scan**, checking all 50,000 rows to find the match.
