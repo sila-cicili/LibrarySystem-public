@@ -19,6 +19,12 @@ Aşağıdaki tablo, proje gereksinimlerinin (Rubric) ne ölçüde karşılandı�
 | **API Development** | ✅ Tamam | **RESTful API:** Spatial (Şube) ve Non-spatial (Kitap) kaynaklar sunar. <br> **Swagger:** API dokümantasyonu `/swagger` adresinde mevcuttur. <br> **Metotlar:** GET, POST, PUT, DELETE aktif. |
 | **Database** | ✅ Tamam | İlişkisel veritabanı olarak **PostgreSQL** ve mekansal veriler için **PostGIS** kullanılmıştır. |
 | **Dashboard** | ✅ Tamam | Admin panelinde anlık istatistikler ve kitap kategorilerini gösteren **Chart.js** grafikleri bulunmaktadır. |
+| **Performance Testing** | ✅ Tamam | Load and Stress testing using **Artillery/JMeter**. Includes response time vs. user count graphs. |
+| **Performance Monitoring** | ✅ Tamam | Analysis of **B-Trees** and **R-Trees** indexing impact on query execution time. |
+
+---
+
+
 
 ---
 
@@ -37,13 +43,14 @@ Aşağıdaki tablo, proje gereksinimlerinin (Rubric) ne ölçüde karşılandı�
 
 ### 1. Yönetim Paneli (Dashboard)
 *(Buraya Dashboard sayfanın ekran görüntüsünü ekleyebilirsin)*
+![Panel](images/kullanıcı.png)
 
 ### 2. Swagger API Dokümantasyonu
 *(Buraya Swagger sayfasının ekran görüntüsünü ekleyebilirsin)*
-
+![swagger](images/swagger.png)
 ### 3. Harita ve Şube Yönetimi
 *(Buraya haritalı şube ekleme sayfasının ekran görüntüsünü ekleyebilirsin)*
-
+![harita](images/harita.png)
 ---
 
 ## ⚙️ Kurulum (Installation)
