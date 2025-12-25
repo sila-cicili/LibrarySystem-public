@@ -102,6 +102,7 @@ Proje çalışırken API endpointlerini test etmek için:
 
 ## 🚀 Performans ve Yük Testleri (Load & Stress Testing)
 Bu stres testi, uygulamanın normal kullanım sınırlarının çok ötesindeki yükler altında (Peak Traffic) kararlılığını ölçmek amacıyla gerçekleştirilmiştir. Hedefimiz, 600 eşzamanlı kullanıcının sisteme aniden yüklenmesi durumunda; veritabanı bağlantı havuzunun (connection pool) tıkanıp tıkanmadığını, API'nin çöküp çökmediğini (Crash) ve sistemin veri bütünlüğünü koruyup koruyamadığını analiz etmektir. Bu test ile sistemin sadece hızlı değil, aynı zamanda zorlu koşullarda sürdürülebilir ve dayanıklı (Resilient) olduğu doğrulanmak istenmiştir. 
+
 ---
 Sistemin dayanıklılığını ölçmek için **Apache JMeter** kullanılarak testler gerçekleştirilmiştir. Veritabanına **50.000 adet Dummy (sahte) kitap verisi** eklenmiş ve testler bu set üzerinde koşulmuştur.
 
@@ -119,6 +120,7 @@ Sistemin dayanıklılığını ölçmek için **Apache JMeter** kullanılarak te
 ![Stress Test Grafiği](images/1000.png)
 ---
 1000 kullanıcılı stres testi sonucunda sistem, normal çalışma süresinin üzerinde (3.4 sn) yanıt verse de kesintisiz erişilebilirlik (100% Availability) sağlamıştır. Herhangi bir HTTP 500 hatası veya sistem çökmesi yaşanmamış olması, altyapının yüksek trafik dalgalanmalarını (Traffic Spikes) tolere edebilecek sağlamlıkta olduğunu göstermektedir.
+
 ---
 
 ## ⚡ Veritabanı İndeksleme Deneyi (Performance Monitoring)
