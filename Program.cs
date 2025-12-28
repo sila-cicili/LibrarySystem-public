@@ -25,10 +25,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // VERİTABANI BAĞLANTISI
 // Not: Burada 'LibraryContext' yazması doğru, çünkü ConnectionString ismin bu.
-builder.Services.AddDbContext<KütüphaneeContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("LibraryContext"), 
-        o => o.UseNetTopologySuite())); 
+// --- 🛠️ RAILWAY BAĞLANTI AYARI (YENİ) ---
+var connectionString = builder.Configuration.GetConnectionString("LibraryContext");
 
+// Eğer Railway üzerinden bir bağlantı adresi geliyorsa (Variable), onu kullan:
+var railwayStr = Environment.GetEnvironmentVariable("ConnectionStrings__LibraryContext");
+if (!string.IsNullOrEmpty(railwayStr))
+{
+    connectionString = railwayStr;
+}
+
+builder.Services.AddDbContext<KütüphaneeContext>(options =>
+    options.UseNpgsql(connectionString, 
+        o => o.UseNetTopologySuite())); 
+// ----------------------------------------
 // Kendi Servislerin
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
