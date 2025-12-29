@@ -2,6 +2,7 @@ using LibrarySystem.Services;
 using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Npgsql; // 🛠️ Bunu ekledik (Adres dönüştürmek için)
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// GİRİŞ SİSTEMİ
+// GİRİŞ SİSTEMİ (Authentication)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -23,22 +24,57 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
     });
 
-// VERİTABANI BAĞLANTISI
-// Not: Burada 'LibraryContext' yazması doğru, çünkü ConnectionString ismin bu.
-// --- 🛠️ RAILWAY BAĞLANTI AYARI (YENİ) ---
-var connectionString = builder.Configuration.GetConnectionString("LibraryContext");
+// ---------------------------------------------------------
+// 🔥 VERİTABANI BAĞLANTISI (GÜÇLENDİRİLMİŞ KOD) 🔥
+// ---------------------------------------------------------
 
-// Eğer Railway üzerinden bir bağlantı adresi geliyorsa (Variable), onu kullan:
-var railwayStr = Environment.GetEnvironmentVariable("ConnectionStrings__LibraryContext");
-if (!string.IsNullOrEmpty(railwayStr))
+var connectionString = "";
+
+// 1. Railway'den gelen otomatik adresi al (DATABASE_URL)
+var railwayDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+if (!string.IsNullOrEmpty(railwayDatabaseUrl))
 {
-    connectionString = railwayStr;
+    // Railway adresi genellikle 'postgres://' ile başlar, bunu C#'ın anlayacağı formata çeviriyoruz:
+    try 
+    {
+        var databaseUri = new Uri(railwayDatabaseUrl);
+        var userInfo = databaseUri.UserInfo.Split(':');
+        
+        var builderDb = new NpgsqlConnectionStringBuilder
+        {
+            Host = databaseUri.Host,
+            Port = databaseUri.Port,
+            Username = userInfo[0],
+            Password = userInfo[1],
+            Database = databaseUri.LocalPath.TrimStart('/'),
+            SslMode = SslMode.Require,
+            TrustServerCertificate = true // Railway sertifikasını kabul et
+        };
+        connectionString = builderDb.ToString();
+    }
+    catch
+    {
+        // Çeviremezse olduğu gibi kullanmayı dener (Yedek plan)
+        connectionString = railwayDatabaseUrl;
+    }
+}
+else 
+{
+    // Railway yoksa, senin elle eklediğin veya Localhost ayarını kullan
+    var manualStr = Environment.GetEnvironmentVariable("ConnectionStrings__LibraryContext");
+    connectionString = !string.IsNullOrEmpty(manualStr) 
+        ? manualStr 
+        : builder.Configuration.GetConnectionString("LibraryContext");
 }
 
+// Bulunan adres ile veritabanına bağlan
 builder.Services.AddDbContext<KütüphaneeContext>(options =>
     options.UseNpgsql(connectionString, 
-        o => o.UseNetTopologySuite())); 
-// ----------------------------------------
+        o => o.UseNetTopologySuite())); // Harita (PostGIS) desteği
+
+// ---------------------------------------------------------
+
 // Kendi Servislerin
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -48,31 +84,35 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 
-// --- 🔥 SİHİRLİ KOD BURASI: TABLOLARI OLUŞTURUYOR ---
+// --- 🔥 OTOMATİK KURULUM VE HARİTA AÇMA (SİHİRLİ KISIM) ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        // Senin veritabanı sınıfın 'KütüphaneeContext' olduğu için bunu çağırıyoruz
         var context = services.GetRequiredService<KütüphaneeContext>();
         
-        // Bu komut, veritabanı boşsa tabloları (Books, Users vb.) otomatik oluşturur
+        // 👇 İŞTE BU SATIR TERMİNALLE UĞRAŞMANI ENGELLER!
+        // Veritabanına bağlanır ve "PostGIS eklentisini aç" der.
+        context.Database.ExecuteSqlRaw("CREATE EXTENSION IF NOT EXISTS postgis;");
+        
+        // Tabloları oluşturur
         context.Database.Migrate(); 
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Tablolar oluşturulurken bir hata oluştu.");
+        logger.LogError(ex, "Veritabanı kurulurken hata oluştu.");
     }
 }
-// --- SİHİRLİ KOD BİTTİ ---
+// ------------------------------------------------
 
 // 2. MIDDLEWARE AYARLARI
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 else
 {
